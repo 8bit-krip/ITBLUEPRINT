@@ -1,13 +1,23 @@
-// src/components/DonutChart.jsx
-import { PieChart, Pie, Cell } from 'recharts';
+import React from 'react';
+import { PieChart, Pie, Cell, Tooltip } from 'recharts';
 
-const COLORS = ['#228B22', '#FF5733'];
+const COLOR_MAP = {
+  Green: '#228B22',
+  Red: '#D93434',
+  Gray: '#A0AEC0',
+  DefaultCompliant: '#228B22',
+  DefaultNonCompliant: '#D93434',
+};
 
-export default function DonutChart({ compliant = 0, total = 0 }) {
-  const nonCompliant = Math.max(total - compliant, 0);
+function DonutChart({
+  compliant = 0,
+  total = 0,
+  colors = [COLOR_MAP.DefaultCompliant, COLOR_MAP.DefaultNonCompliant],
+}) {
+  const nonCompliant = Math.max(Number(total) - Number(compliant), 0);
   const data = [
-    { name: 'Compliant', value: compliant },
-    { name: 'Non-Compliant', value: nonCompliant }
+    { name: 'Compliant', value: Number(compliant) },
+    { name: 'Non-Compliant', value: nonCompliant },
   ];
 
   const percent = total > 0 ? Math.round((compliant / total) * 100) : 0;
@@ -33,13 +43,24 @@ export default function DonutChart({ compliant = 0, total = 0 }) {
           dataKey="value"
         >
           {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            <Cell
+              key={`cell-${index}`}
+              fill={colors[index % colors.length]}
+              stroke={colors[index % colors.length]}
+            />
           ))}
         </Pie>
+        {/* Tooltip */}
+        <Tooltip
+          formatter={(value,) => [`${value} (${Math.round((value / total) * 100)}%)`, ]}
+        />
       </PieChart>
-      <span className="absolute text-base font-semibold text-gray-800">
+      {/* Percentage in center */}
+      <span className="absolute text-xl font-bold text-gray-800">
         {percent}%
       </span>
     </div>
   );
 }
+
+export default DonutChart;
